@@ -454,12 +454,15 @@ section[data-view] {
 .clippy-image {
     width: 120px;
     height: auto;
-    /* sin image-rendering: pixelated para que el GIF se vea suave */
+    mix-blend-mode: multiply;
+    /* Hace que el fondo blanco del GIF desaparezca */
 }
 
 .about-clippy-image {
     width: 90px;
     height: auto;
+    mix-blend-mode: multiply;
+    /* Mismo efecto en la vista About */
 }
 
 /* Burbuja de diálogo estilo cómic */
@@ -747,12 +750,49 @@ section[data-view] {
    ============================================================ */
 
 .error-message {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     font-size: 13px;
     color: var(--color-error);
     background-color: var(--color-error-bg);
     padding: var(--spacing-xs) var(--spacing-sm);
     border: 1px solid var(--color-error);
     border-radius: 2px;
+}
+
+/* Botón de reintentar dentro del mensaje de error */
+.retry-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 12px;
+    font-family: var(--font-main);
+    font-weight: bold;
+    color: var(--color-error);
+    background-color: var(--color-error-bg);
+    cursor: pointer;
+    white-space: nowrap;
+    /* El texto no se parte en dos líneas */
+    min-height: 44px;
+    /* Tamaño mínimo de tap */
+
+    border-top: 2px solid #ff6666;
+    border-left: 2px solid #ff6666;
+    border-bottom: 2px solid #880000;
+    border-right: 2px solid #880000;
+}
+
+.retry-button:hover {
+    background-color: #ffe0e0;
+}
+
+.retry-button:active {
+    border-top: 2px solid #880000;
+    border-left: 2px solid #880000;
+    border-bottom: 2px solid #ff6666;
+    border-right: 2px solid #ff6666;
 }
 
 
@@ -776,9 +816,10 @@ section[data-view] {
 }
 
 .about-clippy-image {
-    width: 60px;
+    width: 90px;
     height: auto;
-    image-rendering: pixelated;
+    mix-blend-mode: multiply;
+    /* Mismo efecto en la vista About */
 }
 
 .about-title {
@@ -812,6 +853,35 @@ section[data-view] {
 .about-footer {
     font-size: 12px;
     color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   16b. VISTA 404
+   ============================================================ */
+
+/* Ícono de error grande estilo Windows 98 */
+.error-404-icon {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-error);
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 2px solid #ff6666;
+    border-left: 2px solid #ff6666;
+    border-bottom: 2px solid #880000;
+    border-right: 2px solid #880000;
+}
+
+/* Código de error */
+.error-404-code {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-family: var(--font-main);
 }
 
 

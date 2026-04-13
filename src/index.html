@@ -152,7 +152,10 @@
 
                     <!-- Mensaje de error (oculto por defecto) -->
                     <div id="error-message" class="error-message hidden" role="alert" aria-live="assertive">
-                        ⚠️ Ocurrió un error al conectar con Clippy. Intentá de nuevo.
+                        <span id="error-text">⚠️ Ocurrió un error al conectar con Clippy.</span>
+                        <button id="retry-button" class="retry-button" aria-label="Reintentar enviar el mensaje">
+                            Reintentar
+                        </button>
                     </div>
 
                 </div>
@@ -208,6 +211,36 @@
             </main>
         </section>
 
+        <!-- VISTA: 404 -->
+        <section data-view="404" class="hidden">
+            <main class="home-content">
+                <div class="win98-window">
+
+                    <div class="win98-window-titlebar">
+                        <span>⚠️ Error — Página no encontrada</span>
+                    </div>
+
+                    <div class="win98-window-body">
+
+                        <!-- Ícono de error estilo Windows 98 -->
+                        <div class="error-404-icon" aria-hidden="true">✕</div>
+
+                        <div class="speech-bubble">
+                            <p>¡Vaya! Parece que esta página no existe.</p>
+                            <p>¿Necesitás ayuda para volver al inicio? 📎</p>
+                        </div>
+
+                        <p class="error-404-code">Error 404 — Ruta no encontrada</p>
+
+                        <button class="win98-btn win98-btn-primary" onclick="window.navigateTo('/home')"
+                            aria-label="Volver al inicio">
+                            Volver al inicio
+                        </button>
+
+                    </div>
+                </div>
+            </main>
+        </section>
         <!-- ===================== -->
         <!--    FOOTER COMPARTIDO  -->
         <!-- ===================== -->
@@ -218,7 +251,7 @@
       -->
         <footer class="win98-statusbar">
             <span id="statusbar-text">Listo</span>
-            <span class="statusbar-copyright">© 2025 Hernán Ramiro Albornoz</span>
+            <span class="statusbar-copyright">© 2026 Hernán Ramiro Albornoz</span>
         </footer>
 
     </div><!-- fin #app -->
