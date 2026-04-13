@@ -118,93 +118,42 @@ export function preloadGifs(gifList, limit = gifList.length) {
 export function startClippyRotation(imgElement, intervalMs = 4000) {
   if (!imgElement) return null;
 
-  /*
-    Precargamos los primeros 6 GIFs inmediatamente
-    y el resto después de 2 segundos.
-  */
   preloadGifs(CLIPPY_GIFS, 6);
   setTimeout(() => preloadGifs(CLIPPY_GIFS), 2000);
 
   /*
-    Técnica crossfade con dos imágenes superpuestas.
-    ------------------------------------------------
-    En lugar de cambiar el src de una sola imagen
-    (lo que causa parpadeo), usamos DOS imágenes:
-      - imgA: la imagen que se está mostrando (visible)
-      - imgB: la siguiente imagen (invisible, ya cargada)
+    Usamos una sola imagen con fade simple.
+    mix-blend-mode: multiply en el CSS disimula
+    el fondo blanco del GIF fundiéndolo con el fondo gris.
 
-    El proceso es:
-      1. imgB carga el nuevo GIF en segundo plano
-      2. Cuando imgB termina de cargar, hacemos:
-         - imgA → opacity 0 (fade out)
-         - imgB → opacity 1 (fade in)
-      3. Intercambiamos los roles de imgA e imgB
-         para la próxima rotación
+    El flujo es:
+      1. Fade out (opacity 0)
+      2. Cambiamos el src cuando ya es invisible
+      3. Fade in (opacity 1)
 
-    Así nunca hay un momento sin imagen visible.
+    El parpadeo es mínimo porque mix-blend-mode
+    suaviza la transición visualmente.
   */
+  const FADE_DURATION = 300;
 
-  // Obtenemos el contenedor padre de la imagen
-  const container = imgElement.parentElement;
-
-  // Configuramos la imagen original (imgA)
-  const imgA = imgElement;
-  imgA.style.position = "absolute";
-  imgA.style.top = "0";
-  imgA.style.left = "0";
-  imgA.style.width = "100%";
-  imgA.style.opacity = "1";
-  imgA.style.transition = "opacity 0.4s ease";
-
-  // Creamos la segunda imagen (imgB), invisible al inicio
-  const imgB = new Image();
-  imgB.alt = imgA.alt;
-  imgB.style.position = "absolute";
-  imgB.style.top = "0";
-  imgB.style.left = "0";
-  imgB.style.width = "100%";
-  imgB.style.opacity = "0";
-  imgB.style.transition = "opacity 0.4s ease";
-  imgB.style.mixBlendMode = "multiply";
-
-  // Necesitamos que el contenedor sea relative
-  // para que las imágenes absolutas se posicionen bien
-  container.style.position = "relative";
-  container.style.display = "flex";
-  container.style.justifyContent = "center";
-
-  // Agregamos imgB al contenedor
-  container.appendChild(imgB);
-
-  /*
-    Referencia mutable a cuál imagen está "adelante"
-    y cuál está "atrás". Empezamos con imgA adelante.
-  */
-  let front = imgA;
-  let back = imgB;
+  imgElement.style.transition = `opacity ${FADE_DURATION}ms ease`;
 
   const intervalId = setInterval(() => {
-    const newGif = getRandomGif(front.src);
+    const newGif = getRandomGif(imgElement.src);
 
-    /*
-      Cargamos el nuevo GIF en la imagen de atrás.
-      onload espera a que el GIF esté completamente
-      descargado antes de hacer el crossfade.
-      Así nunca se ve una imagen rota o en blanco.
-    */
-    back.onload = () => {
-      // El nuevo GIF está listo: hacemos el crossfade
-      front.style.opacity = "0"; // fade out la imagen actual
-      back.style.opacity = "1"; // fade in la nueva imagen
+    // Fase 1: fade out
+    imgElement.style.opacity = "0";
 
-      // Intercambiamos los roles para la próxima rotación
-      const temp = front;
-      front = back;
-      back = temp;
-    };
+    setTimeout(() => {
+      // Fase 2: cambiamos el src cuando es invisible
+      imgElement.src = newGif;
 
-    // Asignamos el nuevo GIF (dispara la descarga)
-    back.src = newGif;
+      // Fase 3: fade in cuando la imagen cargó
+      imgElement.onload = () => {
+        imgElement.style.opacity = "1";
+      };
+
+    }, FADE_DURATION);
 
   }, intervalMs);
 

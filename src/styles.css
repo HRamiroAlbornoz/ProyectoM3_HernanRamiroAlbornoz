@@ -449,14 +449,6 @@ section[data-view] {
 .clippy-container {
     display: flex;
     justify-content: center;
-    /*
-    Altura fija para que el contenedor no colapse
-    cuando las imágenes están en position: absolute.
-    Ajustamos según el tamaño del GIF en mobile.
-  */
-    position: relative;
-    width: 120px;
-    height: 120px;
     margin: 0 auto;
 }
 
@@ -470,7 +462,6 @@ section[data-view] {
     width: 90px;
     height: auto;
     mix-blend-mode: multiply;
-    transition: opacity 0.4s ease;
 }
 
 /* Burbuja de diálogo estilo cómic */
@@ -945,11 +936,6 @@ section[data-view] {
         width: 110px;
     }
 
-    .clippy-container {
-        width: 150px;
-        height: 150px;
-    }
-
     /* Los mensajes no ocupan más del 70% del ancho */
     .message {
         max-width: 70%;
@@ -983,11 +969,6 @@ section[data-view] {
 
     .clippy-image {
         width: 180px;
-    }
-
-    .clippy-container {
-        width: 180px;
-        height: 180px;
     }
 
     /* En desktop el chat tiene un ancho máximo centrado */

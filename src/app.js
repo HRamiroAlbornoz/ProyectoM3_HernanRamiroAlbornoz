@@ -30,11 +30,11 @@ import { startClippyRotation } from "./utils.js";
   que tiene data-view="chat"
 */
 const ROUTES = {
-    "/": "home",
-    "/home": "home",
-    "/chat": "chat",
-    "/about": "about",
-    "/404": "404",
+  "/": "home",
+  "/home": "home",
+  "/chat": "chat",
+  "/about": "about",
+  "/404": "404",
 };
 
 /*
@@ -63,19 +63,19 @@ const DEFAULT_ROUTE = "/home";
   3. Llama a renderView para mostrar la vista correcta
 */
 function navigateTo(path) {
-    /*
-      Si la ruta existe en ROUTES la usamos.
-      Si no existe, mostramos la vista 404.
-    */
-    const viewName = ROUTES[path] !== undefined
-        ? ROUTES[path]
-        : "404";
+  /*
+    Si la ruta existe en ROUTES la usamos.
+    Si no existe, mostramos la vista 404.
+  */
+  const viewName = ROUTES[path] !== undefined
+    ? ROUTES[path]
+    : "404";
 
-    // Actualizamos la URL (aunque sea una ruta inválida)
-    history.pushState({ view: viewName }, "", path);
+  // Actualizamos la URL (aunque sea una ruta inválida)
+  history.pushState({ view: viewName }, "", path);
 
-    // Mostramos la vista correspondiente
-    renderView(viewName);
+  // Mostramos la vista correspondiente
+  renderView(viewName);
 }
 
 /*
@@ -100,93 +100,93 @@ window.navigateTo = navigateTo;
     viewName: string — el nombre de la vista. Ej: "home", "chat"
 */
 function renderView(viewName) {
-    // --- 3a. Mostrar/ocultar vistas ---
+  // --- 3a. Mostrar/ocultar vistas ---
 
-    /*
-      Obtenemos todas las secciones con atributo data-view.
-      Recorremos cada una: si su data-view coincide con viewName,
-      la mostramos; si no, la ocultamos con la clase "hidden".
-    */
-    const views = document.querySelectorAll("section[data-view]");
+  /*
+    Obtenemos todas las secciones con atributo data-view.
+    Recorremos cada una: si su data-view coincide con viewName,
+    la mostramos; si no, la ocultamos con la clase "hidden".
+  */
+  const views = document.querySelectorAll("section[data-view]");
 
-    views.forEach((section) => {
-        if (section.dataset.view === viewName) {
-            section.classList.remove("hidden"); // Mostrar
-        } else {
-            section.classList.add("hidden");    // Ocultar
-        }
-    });
-
-    // --- 3b. Actualizar el link activo en la navegación ---
-
-    /*
-      Recorremos todos los links de la nav y les agregamos o
-      quitamos la clase "active" según corresponda.
-      La clase "active" hace que el botón se vea "presionado".
-    */
-    const navLinks = document.querySelectorAll(".nav-link");
-
-    navLinks.forEach((link) => {
-        /*
-          link.getAttribute("href") devuelve la ruta del link.
-          Ej: "/chat", "/home", "/about"
-          La comparamos con la ruta en ROUTES para saber si coincide.
-        */
-        const linkPath = link.getAttribute("href");
-        const linkView = ROUTES[linkPath];
-
-        if (linkView === viewName) {
-            link.classList.add("active");
-        } else {
-            link.classList.remove("active");
-        }
-    });
-
-    // --- 3c. Actualizar el texto del statusbar ---
-
-    /*
-      Cambiamos el texto de la barra de estado según la vista activa.
-      Esto le da un toque extra al estilo Windows 98.
-    */
-    const statusMessages = {
-        home: "Listo",
-        chat: "Conectado con Clippy 📎",
-        about: "Acerca de Clippy AI",
-        "404": "Error 404 — Página no encontrada",
-    };
-
-    const statusbar = document.getElementById("statusbar-text");
-    if (statusbar) {
-        statusbar.textContent = statusMessages[viewName] || "Listo";
+  views.forEach((section) => {
+    if (section.dataset.view === viewName) {
+      section.classList.remove("hidden"); // Mostrar
+    } else {
+      section.classList.add("hidden");    // Ocultar
     }
+  });
 
-    // --- 3d. Actualizar el título de la pestaña del navegador ---
+  // --- 3b. Actualizar el link activo en la navegación ---
 
-    const pageTitles = {
-        home: "Clippy AI",
-        chat: "Clippy AI — Chat",
-        about: "Clippy AI — Acerca de",
-        "404": "Clippy AI — Página no encontrada",
-    };
+  /*
+    Recorremos todos los links de la nav y les agregamos o
+    quitamos la clase "active" según corresponda.
+    La clase "active" hace que el botón se vea "presionado".
+  */
+  const navLinks = document.querySelectorAll(".nav-link");
 
-    document.title = pageTitles[viewName] || "Clippy AI";
-
-    // --- 3e. Iniciar rotación de GIFs si estamos en Home o About ---
-
+  navLinks.forEach((link) => {
     /*
-      Cuando navegamos a Home, iniciamos la rotación de GIFs.
-      Guardamos el ID del intervalo para poder detenerlo si
-      el usuario navega a otra vista (evita memory leaks).
+      link.getAttribute("href") devuelve la ruta del link.
+      Ej: "/chat", "/home", "/about"
+      La comparamos con la ruta en ROUTES para saber si coincide.
     */
-    if (viewName === "home") {
-        const clippyImg = document.getElementById("clippy-gif");
-        startClippyRotation(clippyImg, 4000);
-    }
+    const linkPath = link.getAttribute("href");
+    const linkView = ROUTES[linkPath];
 
-    if (viewName === "about") {
-        const clippyImgAbout = document.getElementById("clippy-gif-about");
-        startClippyRotation(clippyImgAbout, 4000);
+    if (linkView === viewName) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
     }
+  });
+
+  // --- 3c. Actualizar el texto del statusbar ---
+
+  /*
+    Cambiamos el texto de la barra de estado según la vista activa.
+    Esto le da un toque extra al estilo Windows 98.
+  */
+  const statusMessages = {
+    home: "Listo",
+    chat: "Conectado con Clippy 📎",
+    about: "Acerca de Clippy AI",
+    "404": "Error 404 — Página no encontrada",
+  };
+
+  const statusbar = document.getElementById("statusbar-text");
+  if (statusbar) {
+    statusbar.textContent = statusMessages[viewName] || "Listo";
+  }
+
+  // --- 3d. Actualizar el título de la pestaña del navegador ---
+
+  const pageTitles = {
+    home: "Clippy AI",
+    chat: "Clippy AI — Chat",
+    about: "Clippy AI — Acerca de",
+    "404": "Clippy AI — Página no encontrada",
+  };
+
+  document.title = pageTitles[viewName] || "Clippy AI";
+
+  // --- 3e. Iniciar rotación de GIFs si estamos en Home o About ---
+
+  /*
+    Cuando navegamos a Home, iniciamos la rotación de GIFs.
+    Guardamos el ID del intervalo para poder detenerlo si
+    el usuario navega a otra vista (evita memory leaks).
+  */
+  if (viewName === "home") {
+    const clippyImg = document.getElementById("clippy-gif");
+    startClippyRotation(clippyImg, 7000);
+  }
+
+  if (viewName === "about") {
+    const clippyImgAbout = document.getElementById("clippy-gif-about");
+    startClippyRotation(clippyImgAbout, 7000);
+  }
 }
 
 
@@ -200,52 +200,52 @@ function renderView(viewName) {
   recargue la página, usamos navigateTo para navegar sin recarga.
 */
 function setupNavLinks() {
+  /*
+    Usamos "delegación de eventos": en lugar de agregar un
+    listener a cada link por separado, escuchamos todos los
+    clicks en el documento y filtramos los que nos interesan.
+
+    Ventaja: funciona aunque los links se agreguen dinámicamente.
+  */
+  document.addEventListener("click", (event) => {
     /*
-      Usamos "delegación de eventos": en lugar de agregar un
-      listener a cada link por separado, escuchamos todos los
-      clicks en el documento y filtramos los que nos interesan.
-  
-      Ventaja: funciona aunque los links se agreguen dinámicamente.
+      event.target es el elemento que recibió el click.
+      closest("[data-link]") busca el ancestro más cercano
+      (o el mismo elemento) que tenga el atributo data-link.
     */
-    document.addEventListener("click", (event) => {
-        /*
-          event.target es el elemento que recibió el click.
-          closest("[data-link]") busca el ancestro más cercano
-          (o el mismo elemento) que tenga el atributo data-link.
-        */
-        const link = event.target.closest("[data-link]");
+    const link = event.target.closest("[data-link]");
 
-        // Si el click no fue en un link de navegación, ignoramos
-        if (!link) return;
+    // Si el click no fue en un link de navegación, ignoramos
+    if (!link) return;
 
-        /*
-          Si el usuario hizo Ctrl+click (Windows/Linux) o
-          Cmd+click (Mac) o Shift+click o click con el botón del medio,
-          dejamos que el navegador abra el link en una nueva pestaña
-          con su comportamiento por defecto. NO prevenimos el evento.
-        */
-        if (
-            event.ctrlKey ||  // Ctrl+click en Windows/Linux
-            event.metaKey ||  // Cmd+click en Mac
-            event.shiftKey ||  // Shift+click (nueva pestaña/ventana)
-            event.button === 1 // Click con botón del medio del mouse
-        ) {
-            return; // Dejamos que el navegador maneje el click normalmente
-        }
+    /*
+      Si el usuario hizo Ctrl+click (Windows/Linux) o
+      Cmd+click (Mac) o Shift+click o click con el botón del medio,
+      dejamos que el navegador abra el link en una nueva pestaña
+      con su comportamiento por defecto. NO prevenimos el evento.
+    */
+    if (
+      event.ctrlKey ||  // Ctrl+click en Windows/Linux
+      event.metaKey ||  // Cmd+click en Mac
+      event.shiftKey ||  // Shift+click (nueva pestaña/ventana)
+      event.button === 1 // Click con botón del medio del mouse
+    ) {
+      return; // Dejamos que el navegador maneje el click normalmente
+    }
 
-        /*
-          Prevenimos el comportamiento por defecto del navegador
-          (que sería recargar la página o cambiar la URL de forma
-          tradicional).
-        */
-        event.preventDefault();
+    /*
+      Prevenimos el comportamiento por defecto del navegador
+      (que sería recargar la página o cambiar la URL de forma
+      tradicional).
+    */
+    event.preventDefault();
 
-        // Obtenemos la ruta del atributo href del link
-        const path = link.getAttribute("href");
+    // Obtenemos la ruta del atributo href del link
+    const path = link.getAttribute("href");
 
-        // Navegamos a esa ruta
-        if (path) navigateTo(path);
-    });
+    // Navegamos a esa ruta
+    if (path) navigateTo(path);
+  });
 }
 
 
@@ -265,15 +265,15 @@ function setupNavLinks() {
   vez), usamos la URL actual para determinar la vista.
 */
 window.addEventListener("popstate", (event) => {
-    if (event.state && event.state.view) {
-        // Tenemos el nombre de la vista guardado en el estado
-        renderView(event.state.view);
-    } else {
-        // No hay estado: determinamos la vista por la URL actual
-        const path = window.location.pathname;
-        const viewName = ROUTES[path] || ROUTES[DEFAULT_ROUTE];
-        renderView(viewName);
-    }
+  if (event.state && event.state.view) {
+    // Tenemos el nombre de la vista guardado en el estado
+    renderView(event.state.view);
+  } else {
+    // No hay estado: determinamos la vista por la URL actual
+    const path = window.location.pathname;
+    const viewName = ROUTES[path] || ROUTES[DEFAULT_ROUTE];
+    renderView(viewName);
+  }
 });
 
 
@@ -290,40 +290,40 @@ window.addEventListener("popstate", (event) => {
   2. Mostrar la vista correcta según la URL actual
 */
 function init() {
-    // Configuramos la navegación por links
-    setupNavLinks();
+  // Configuramos la navegación por links
+  setupNavLinks();
 
-    /*
-      Determinamos qué vista mostrar al cargar la página.
-  
-      window.location.pathname es la parte de la URL después
-      del dominio. Ejemplos:
-        https://clippy-ai.vercel.app/       → pathname = "/"
-        https://clippy-ai.vercel.app/chat   → pathname = "/chat"
-        https://clippy-ai.vercel.app/about  → pathname = "/about"
-  
-      Buscamos esa ruta en ROUTES. Si no la encontramos,
-      usamos la ruta por defecto (home).
-    */
-    const currentPath = window.location.pathname;
+  /*
+    Determinamos qué vista mostrar al cargar la página.
 
-    /*
-      Si la ruta existe en ROUTES la usamos.
-      Si no existe (ej: /nonexistent), mostramos la vista 404.
-    */
-    const initialView = ROUTES[currentPath] !== undefined
-        ? ROUTES[currentPath]
-        : "404";
+    window.location.pathname es la parte de la URL después
+    del dominio. Ejemplos:
+      https://clippy-ai.vercel.app/       → pathname = "/"
+      https://clippy-ai.vercel.app/chat   → pathname = "/chat"
+      https://clippy-ai.vercel.app/about  → pathname = "/about"
 
-    /*
-      Reemplazamos el estado actual del historial con la vista
-      inicial. Usamos replaceState (no pushState) para no agregar
-      una entrada extra al historial del navegador.
-    */
-    history.replaceState({ view: initialView }, "", currentPath);
+    Buscamos esa ruta en ROUTES. Si no la encontramos,
+    usamos la ruta por defecto (home).
+  */
+  const currentPath = window.location.pathname;
 
-    // Mostramos la vista inicial
-    renderView(initialView);
+  /*
+    Si la ruta existe en ROUTES la usamos.
+    Si no existe (ej: /nonexistent), mostramos la vista 404.
+  */
+  const initialView = ROUTES[currentPath] !== undefined
+    ? ROUTES[currentPath]
+    : "404";
+
+  /*
+    Reemplazamos el estado actual del historial con la vista
+    inicial. Usamos replaceState (no pushState) para no agregar
+    una entrada extra al historial del navegador.
+  */
+  history.replaceState({ view: initialView }, "", currentPath);
+
+  // Mostramos la vista inicial
+  renderView(initialView);
 }
 
 /*
