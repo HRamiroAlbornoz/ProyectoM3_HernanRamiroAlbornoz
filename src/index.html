@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <!--
+      viewport: hace que la página se vea bien en celulares.
+      width=device-width: usa el ancho real del dispositivo.
+      initial-scale=1.0: no hace zoom automático.
+      interactive-widget=resizes-content: cuando aparece el teclado
+      en el celular, el contenido se achica en lugar de quedar tapado.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+
+    <title>Clippy AI</title>
+
+    <!-- Enlazamos la hoja de estilos CSS -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <!--
+      #app es el contenedor principal de toda la aplicación.
+      Usa flexbox en columna para apilar:
+      [header] [nav] [vista activa] [footer]
+    -->
+    <div id="app">
+
+        <!-- ===================== -->
+        <!--    HEADER COMPARTIDO  -->
+        <!-- ===================== -->
+        <!--
+        Este header es compartido por todas las vistas.
+        Solo se escribe una vez aquí.
+      -->
+        <header class="win98-titlebar">
+            <span class="titlebar-title">📎 Clippy AI</span>
+            <div class="titlebar-buttons">
+                <button class="titlebar-btn" aria-label="Minimizar">_</button>
+                <button class="titlebar-btn" aria-label="Maximizar">□</button>
+                <button class="titlebar-btn" aria-label="Cerrar">✕</button>
+            </div>
+        </header>
+
+        <!-- ===================== -->
+        <!--     NAV COMPARTIDA    -->
+        <!-- ===================== -->
+        <!--
+        La barra de navegación también es compartida.
+        JavaScript se encargará de marcar con la clase "active"
+        el link correspondiente a la vista actual.
+      -->
+        <nav class="win98-nav" role="navigation" aria-label="Navegación principal">
+            <a href="/home" class="nav-link" data-link>Inicio</a>
+            <a href="/chat" class="nav-link" data-link>Chat</a>
+            <a href="/about" class="nav-link" data-link>Acerca de</a>
+        </nav>
+
+        <!-- ===================== -->
+        <!--         VISTAS        -->
+        <!-- ===================== -->
+        <!--
+        Cada sección es una vista de la SPA.
+        data-view: nombre de la vista, usado por el router en app.js
+        La clase "hidden" oculta la vista (display: none en el CSS).
+        Solo una vista estará visible a la vez.
+      -->
+
+        <!-- VISTA: HOME -->
+        <section data-view="home">
+            <main class="home-content">
+                <div class="win98-window">
+
+                    <!-- Título interno de la ventana -->
+                    <div class="win98-window-titlebar">
+                        <span>Bienvenido a Clippy AI</span>
+                    </div>
+
+                    <!-- Cuerpo de la ventana -->
+                    <div class="win98-window-body">
+
+                        <!-- Imagen animada de Clippy con rotación automática -->
+                        <div class="clippy-container" aria-hidden="true">
+                            <img id="clippy-gif" src="assets/clippy-white-1.gif"
+                                alt="Clippy, el asistente de Microsoft Office" class="clippy-image" />
+                        </div>
+
+                        <!-- Burbuja de diálogo de Clippy -->
+                        <div class="speech-bubble" role="complementary" aria-label="Mensaje de Clippy">
+                            <p>¡Hola! Parece que estás intentando iniciar una conversación.</p>
+                            <p>¿Necesitas ayuda con eso? 📎</p>
+                        </div>
+
+                        <!-- Botón para ir al chat -->
+                        <button class="win98-btn win98-btn-primary" onclick="window.navigateTo('/chat')"
+                            aria-label="Ir al chat con Clippy">
+                            ¡Hablar con Clippy!
+                        </button>
+
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <!-- VISTA: CHAT -->
+        <section data-view="chat" class="hidden">
+            <main class="chat-layout">
+
+                <!--
+            Panel de mensajes: el único elemento que hace scroll.
+            role="log" y aria-live="polite" permiten que los lectores
+            de pantalla anuncien los mensajes nuevos automáticamente.
+          -->
+                <div id="messages-panel" class="messages-panel" role="log" aria-live="polite"
+                    aria-label="Historial de conversación">
+                    <!-- Mensaje de bienvenida inicial -->
+                    <div class="message message-bot">
+                        <div class="message-bubble">
+                            <p>¡Hola! Soy Clippy, tu asistente. 📎</p>
+                            <p>Parece que querés escribir algo. ¿Necesitás ayuda con eso?</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--
+            Composer: área de input y botón de enviar.
+            Siempre visible en la parte inferior del chat.
+          -->
+                <div class="chat-composer" role="form" aria-label="Escribir mensaje">
+
+                    <!-- Indicador de "Clippy está escribiendo..." (oculto por defecto) -->
+                    <div id="typing-indicator" class="typing-indicator hidden" aria-live="polite"
+                        aria-label="Clippy está escribiendo">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-text">Clippy está escribiendo...</span>
+                    </div>
+
+                    <!-- Fila con el textarea y el botón de enviar -->
+                    <div class="composer-row">
+                        <textarea id="message-input" class="message-input" placeholder="Escribí tu mensaje aquí..."
+                            rows="1" aria-label="Escribir mensaje" autocomplete="off" autocorrect="on"
+                            spellcheck="true"></textarea>
+
+                        <button id="send-button" class="send-button" aria-label="Enviar mensaje" title="Enviar mensaje">
+                            ➤
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de error (oculto por defecto) -->
+                    <div id="error-message" class="error-message hidden" role="alert" aria-live="assertive">
+                        ⚠️ Ocurrió un error al conectar con Clippy. Intentá de nuevo.
+                    </div>
+
+                </div>
+            </main>
+        </section>
+
+        <!-- VISTA: ABOUT -->
+        <section data-view="about" class="hidden">
+            <main class="about-content">
+                <div class="win98-window">
+
+                    <div class="win98-window-titlebar">
+                        <span>Acerca de Clippy AI</span>
+                    </div>
+
+                    <div class="win98-window-body about-body">
+
+                        <img id="clippy-gif-about" src="assets/clippy-white-1.gif" alt="Clippy"
+                            class="about-clippy-image" />
+
+                        <h1 class="about-title">Clippy AI</h1>
+                        <p class="about-version">Versión 1.0 — Edición Nostalgia</p>
+
+                        <hr class="win98-divider" />
+
+                        <p>
+                            <strong>Clippy AI</strong> es una aplicación web que te permite conversar
+                            con Clippy, el legendario asistente de Microsoft Office de los años 90.
+                        </p>
+
+                        <p>
+                            Impulsado por inteligencia artificial, Clippy está listo para ayudarte
+                            (o intentarlo, al menos) con todo lo que necesites.
+                        </p>
+
+                        <hr class="win98-divider" />
+
+                        <p><strong>Tecnologías utilizadas:</strong></p>
+                        <ul class="about-list">
+                            <li>HTML, CSS y JavaScript</li>
+                            <li>Google Gemini AI</li>
+                            <li>Vercel Serverless Functions</li>
+                        </ul>
+
+                        <hr class="win98-divider" />
+
+                        <p class="about-footer">
+                            Proyecto Integrador 3 — Desarrollado con 💙
+                        </p>
+
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <!-- ===================== -->
+        <!--    FOOTER COMPARTIDO  -->
+        <!-- ===================== -->
+        <!--
+        La barra de estado es compartida por todas las vistas.
+        JavaScript puede actualizar su texto según la vista activa.
+        El copyright aparece alineado a la derecha.
+      -->
+        <footer class="win98-statusbar">
+            <span id="statusbar-text">Listo</span>
+            <span class="statusbar-copyright">© 2025 Hernán Ramiro Albornoz</span>
+        </footer>
+
+    </div><!-- fin #app -->
+
+    <!-- Enlazamos los archivos JavaScript -->
+    <!-- utils.js: funciones de utilidad reutilizables -->
+    <script src="utils.js" type="module"></script>
+    <!-- chat.js: lógica del chat -->
+    <script src="chat.js" type="module"></script>
+    <!-- app.js: routing y lógica principal -->
+    <script src="app.js" type="module"></script>
+
+</body>
+
+</html>

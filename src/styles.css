@@ -1,0 +1,934 @@
+/* ============================================================
+   CLIPPY AI — styles.css
+   Estilo retro Windows 98, enfoque mobile-first.
+   Breakpoints: 320px (base), 768px (tablet), 1024px (desktop)
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES Y RESET GLOBAL
+   ============================================================ */
+
+/*
+  Las variables CSS (--nombre) nos permiten definir colores y
+  valores en un solo lugar y reutilizarlos en todo el archivo.
+  Si queremos cambiar un color, lo cambiamos una sola vez aquí.
+*/
+:root {
+    /* Colores principales estilo Windows 98 */
+    --color-bg: #008080;
+    /* Verde/teal clásico del escritorio */
+    --color-window-bg: #d4d0c8;
+    /* Gris claro de las ventanas */
+    --color-titlebar: #000080;
+    /* Azul oscuro de la barra de título */
+    --color-titlebar-text: #ffffff;
+    /* Texto blanco en la barra de título */
+    --color-nav-bg: #d4d0c8;
+    /* Fondo de la barra de navegación */
+    --color-border-light: #ffffff;
+    /* Borde claro (efecto 3D) */
+    --color-border-dark: #808080;
+    /* Borde oscuro (efecto 3D) */
+    --color-border-darker: #404040;
+    /* Borde más oscuro */
+    --color-text: #000000;
+    /* Texto principal */
+    --color-text-muted: #444444;
+    /* Texto secundario */
+
+    /* Colores del chat */
+    --color-msg-user-bg: #000080;
+    /* Fondo mensaje usuario (azul Windows) */
+    --color-msg-user-text: #ffffff;
+    /* Texto mensaje usuario */
+    --color-msg-bot-bg: #ffffff;
+    /* Fondo mensaje Clippy */
+    --color-msg-bot-text: #000000;
+    /* Texto mensaje Clippy */
+
+    /* Colores de estado */
+    --color-error: #cc0000;
+    /* Rojo para errores */
+    --color-error-bg: #fff0f0;
+    /* Fondo suave para errores */
+
+    /* Colores del botón primario */
+    --color-btn-bg: #d4d0c8;
+    --color-btn-hover: #e8e4dc;
+
+    /* Tipografía */
+    --font-main: "Courier New", Courier, monospace;
+
+    /* Espaciado */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+
+    /* Alturas fijas del layout */
+    --titlebar-height: 32px;
+    --nav-height: 36px;
+    --composer-height: 80px;
+    /* Altura mínima del área de input */
+    --statusbar-height: 24px;
+}
+
+/*
+  Reset básico: elimina márgenes y paddings por defecto del navegador.
+  box-sizing: border-box hace que el padding y el borde se incluyan
+  dentro del ancho/alto del elemento (evita desbordamientos).
+*/
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/*
+  html y body ocupan el 100% de la pantalla.
+  dvh (dynamic viewport height) es la unidad moderna que tiene en
+  cuenta el teclado virtual en mobile, evitando que tape el contenido.
+*/
+html,
+body {
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    /* Sin scroll en el body: solo el panel de mensajes scrollea */
+    font-family: var(--font-main);
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+}
+
+/* Elimina el estilo por defecto de las listas */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+/* Elimina el estilo por defecto de los links */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* ============================================================
+   2. UTILIDADES
+   ============================================================ */
+
+/* Oculta un elemento completamente */
+.hidden {
+    display: none !important;
+}
+
+/*
+  Focus visible: cuando un elemento recibe el foco por teclado
+  (con la tecla Tab), mostramos un borde visible.
+  Esto es importante para la accesibilidad y navegación por teclado.
+*/
+:focus-visible {
+    outline: 2px solid var(--color-titlebar);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. EFECTO 3D ESTILO WINDOWS 98
+   ============================================================ */
+
+/*
+  El efecto 3D de Windows 98 se logra con bordes de distintos colores.
+  .win98-raised: elemento que "sobresale" (como un botón sin presionar)
+  .win98-inset: elemento "hundido" (como un input o panel)
+*/
+.win98-raised {
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+.win98-inset {
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+}
+
+
+/* ============================================================
+   4. LAYOUT PRINCIPAL — #app Y SECCIONES (VISTAS)
+   ============================================================ */
+
+/*
+  #app es el contenedor principal.
+  Usa flexbox en columna para apilar:
+  [header] [nav] [section activa] [footer]
+  height: 100dvh ocupa toda la pantalla con soporte para
+  el teclado virtual en mobile.
+*/
+#app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--color-bg);
+}
+
+/*
+  Cada sección (vista) ocupa el espacio restante entre
+  la nav y el footer. flex: 1 hace exactamente eso.
+  overflow: hidden evita desbordamientos.
+*/
+section[data-view] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-window-bg);
+}
+
+
+/* ============================================================
+   5. BARRA DE TÍTULO (TITLEBAR)
+   ============================================================ */
+
+.win98-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--titlebar-height);
+    min-height: var(--titlebar-height);
+    padding: 0 var(--spacing-sm);
+    background: linear-gradient(to right,
+            var(--color-titlebar),
+            #1084d0);
+    /* Degradado azul clásico de Windows 98 */
+    color: var(--color-titlebar-text);
+    user-select: none;
+    /* Evita seleccionar el texto al hacer clic */
+    flex-shrink: 0;
+    /* No se achica si falta espacio */
+}
+
+.titlebar-title {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* Grupo de botones de la titlebar (_  □  ✕) */
+.titlebar-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.titlebar-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-family: var(--font-main);
+    background-color: var(--color-window-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+/* Efecto al presionar el botón de la titlebar */
+.titlebar-btn:active {
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+}
+
+
+/* ============================================================
+   6. BARRA DE NAVEGACIÓN (NAV)
+   ============================================================ */
+
+.win98-nav {
+    display: flex;
+    align-items: center;
+    height: var(--nav-height);
+    min-height: var(--nav-height);
+    padding: 0 var(--spacing-sm);
+    gap: var(--spacing-xs);
+    background-color: var(--color-nav-bg);
+    border-bottom: 2px solid var(--color-border-dark);
+    flex-shrink: 0;
+}
+
+.nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 13px;
+    font-family: var(--font-main);
+    color: var(--color-text);
+    background-color: var(--color-btn-bg);
+    cursor: pointer;
+    min-height: 28px;
+    /* Tamaño mínimo de tap para mobile */
+    min-width: 44px;
+    /* Tamaño mínimo de tap para mobile */
+
+    /* Efecto 3D raised */
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+.nav-link:hover {
+    background-color: var(--color-btn-hover);
+}
+
+/* Link activo: parece presionado (efecto inset) */
+.nav-link.active {
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+    background-color: var(--color-window-bg);
+}
+
+.nav-link:active {
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+}
+
+
+/* ============================================================
+   7. BARRA DE ESTADO (STATUSBAR)
+   ============================================================ */
+
+.win98-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* "Listo" a la izquierda, copyright a la derecha */
+    height: var(--statusbar-height);
+    min-height: var(--statusbar-height);
+    padding: 0 var(--spacing-sm);
+    background-color: var(--color-window-bg);
+    border-top: 2px solid var(--color-border-dark);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+/* Texto de copyright alineado a la derecha */
+.statusbar-copyright {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    /* Evita que el texto se parta en dos líneas */
+}
+
+
+/* ============================================================
+   8. VENTANA ESTILO WINDOWS 98 (win98-window)
+   ============================================================ */
+
+/* Contenedor con borde y fondo gris */
+.win98-window {
+    background-color: var(--color-window-bg);
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Barra de título interna de la ventana */
+.win98-window-titlebar {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: linear-gradient(to right,
+            var(--color-titlebar),
+            #1084d0);
+    color: var(--color-titlebar-text);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* Cuerpo de la ventana */
+.win98-window-body {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+
+/* ============================================================
+   9. BOTONES ESTILO WINDOWS 98
+   ============================================================ */
+
+.win98-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-xl);
+    font-size: 14px;
+    font-family: var(--font-main);
+    font-weight: bold;
+    color: var(--color-text);
+    background-color: var(--color-btn-bg);
+    cursor: pointer;
+    min-height: 44px;
+    /* Tamaño mínimo de tap */
+    min-width: 44px;
+
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+.win98-btn:hover {
+    background-color: var(--color-btn-hover);
+}
+
+.win98-btn:active {
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+}
+
+/* Botón primario con fondo azul */
+.win98-btn-primary {
+    background-color: var(--color-titlebar);
+    color: var(--color-titlebar-text);
+    font-size: 15px;
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.win98-btn-primary:hover {
+    background-color: #1084d0;
+}
+
+
+/* ============================================================
+   10. VISTA HOME
+   ============================================================ */
+
+/* El <main> de home ocupa el espacio restante y centra su contenido */
+.home-content {
+    flex: 1;
+    /* Ocupa todo el espacio entre nav y statusbar */
+    overflow-y: auto;
+    /* Scroll si el contenido es muy largo */
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+/* Imagen de Clippy */
+.clippy-container {
+    display: flex;
+    justify-content: center;
+}
+
+.clippy-image {
+    width: 120px;
+    height: auto;
+    /* sin image-rendering: pixelated para que el GIF se vea suave */
+}
+
+.about-clippy-image {
+    width: 90px;
+    height: auto;
+}
+
+/* Burbuja de diálogo estilo cómic */
+.speech-bubble {
+    position: relative;
+    background-color: #ffffc0;
+    /* Amarillo suave, como el tooltip de Clippy */
+    border: 2px solid var(--color-text);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+    width: 100%;
+}
+
+/* El "pico" de la burbuja de diálogo */
+.speech-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 8px 0 8px;
+    border-style: solid;
+    border-color: var(--color-text) transparent transparent transparent;
+}
+
+.speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 6px 0 6px;
+    border-style: solid;
+    border-color: #ffffc0 transparent transparent transparent;
+}
+
+.speech-bubble p+p {
+    margin-top: var(--spacing-sm);
+}
+
+
+/* ============================================================
+   11. VISTA CHAT — LAYOUT
+   ============================================================ */
+
+/*
+  El layout del chat usa flexbox en columna:
+  [mensajes — scrolleable] [composer — fijo abajo]
+  
+  flex: 1 hace que ocupe todo el espacio disponible
+  entre la nav y el borde inferior.
+  overflow: hidden evita que el chat desborde.
+*/
+.chat-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-window-bg);
+}
+
+/* Panel de mensajes: el único que hace scroll */
+.messages-panel {
+    flex: 1;
+    /* Ocupa todo el espacio disponible */
+    overflow-y: auto;
+    /* Scroll vertical cuando hay muchos mensajes */
+    overflow-x: hidden;
+    /* Sin scroll horizontal */
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* Área del composer (input + botón) — siempre visible abajo */
+.chat-composer {
+    flex-shrink: 0;
+    /* No se achica */
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-window-bg);
+    border-top: 2px solid var(--color-border-dark);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+/* Fila con el input y el botón de enviar */
+.composer-row {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: flex-end;
+}
+
+
+/* ============================================================
+   12. MENSAJES DEL CHAT
+   ============================================================ */
+
+/* Contenedor de cada mensaje */
+.message {
+    display: flex;
+    max-width: 85%;
+    /* Los mensajes no ocupan todo el ancho */
+}
+
+/* Mensajes del usuario: alineados a la derecha */
+.message-user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+/* Mensajes de Clippy: alineados a la izquierda */
+.message-bot {
+    align-self: flex-start;
+}
+
+/* Burbuja del mensaje */
+.message-bubble {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+    /* Evita que palabras largas desborden */
+}
+
+/* Burbuja del usuario */
+.message-user .message-bubble {
+    background-color: var(--color-msg-user-bg);
+    color: var(--color-msg-user-text);
+    border-top: 2px solid #1084d0;
+    border-left: 2px solid #1084d0;
+    border-bottom: 2px solid #00003a;
+    border-right: 2px solid #00003a;
+}
+
+/* Burbuja de Clippy */
+.message-bot .message-bubble {
+    background-color: var(--color-msg-bot-bg);
+    color: var(--color-msg-bot-text);
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+/* Párrafos dentro de la burbuja */
+.message-bubble p+p {
+    margin-top: var(--spacing-xs);
+}
+
+
+/* ============================================================
+   13. INPUT Y BOTÓN DE ENVIAR
+   ============================================================ */
+
+/* Área de texto del mensaje */
+.message-input {
+    flex: 1;
+    resize: none;
+    /* Sin resize manual */
+    overflow-y: auto;
+    /* Scroll si el texto es largo */
+    min-height: 44px;
+    /* Tamaño mínimo de tap */
+    max-height: 120px;
+    /* No crece demasiado */
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 15px;
+    /* Más grande para mejor legibilidad */
+    font-family: var(--font-main);
+    color: var(--color-text);
+    background-color: #ffffff;
+    line-height: 1.4;
+
+    /* Efecto inset (hundido) */
+    border-top: 2px solid var(--color-border-darker);
+    border-left: 2px solid var(--color-border-darker);
+    border-bottom: 2px solid var(--color-border-light);
+    border-right: 2px solid var(--color-border-light);
+}
+
+.message-input::placeholder {
+    color: #888888;
+    font-size: 14px;
+}
+
+/* Botón de enviar */
+.send-button {
+    min-width: 52px;
+    /* Tamaño mínimo de tap */
+    min-height: 44px;
+    padding: var(--spacing-sm);
+    font-size: 20px;
+    color: var(--color-titlebar-text);
+    background-color: var(--color-titlebar);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    border-top: 2px solid #1084d0;
+    border-left: 2px solid #1084d0;
+    border-bottom: 2px solid #00003a;
+    border-right: 2px solid #00003a;
+}
+
+.send-button:hover {
+    background-color: #1084d0;
+}
+
+.send-button:active {
+    border-top: 2px solid #00003a;
+    border-left: 2px solid #00003a;
+    border-bottom: 2px solid #1084d0;
+    border-right: 2px solid #1084d0;
+}
+
+/* Estado deshabilitado del botón */
+.send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   14. INDICADOR DE "ESCRIBIENDO..."
+   ============================================================ */
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) 0;
+}
+
+.typing-text {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* Los tres puntitos animados */
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-titlebar);
+    border-radius: 50%;
+    animation: typing-bounce 1.2s infinite ease-in-out;
+}
+
+/* Cada punto empieza su animación con un pequeño retraso */
+.typing-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-6px);
+    }
+}
+
+
+/* ============================================================
+   15. MENSAJE DE ERROR
+   ============================================================ */
+
+.error-message {
+    font-size: 13px;
+    color: var(--color-error);
+    background-color: var(--color-error-bg);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-error);
+    border-radius: 2px;
+}
+
+
+/* ============================================================
+   16. VISTA ABOUT
+   ============================================================ */
+
+.about-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.about-body {
+    text-align: center;
+    gap: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.about-clippy-image {
+    width: 60px;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.about-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color-titlebar);
+}
+
+.about-version {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.win98-divider {
+    border: none;
+    border-top: 1px solid var(--color-border-dark);
+    width: 100%;
+    margin: var(--spacing-sm) 0;
+}
+
+.about-list {
+    list-style: disc;
+    padding-left: var(--spacing-xl);
+    text-align: left;
+}
+
+.about-list li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.about-footer {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   17. SCROLLBAR ESTILO WINDOWS 98
+   (solo en navegadores basados en Chromium/WebKit)
+   ============================================================ */
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--color-window-bg);
+    border: 1px solid var(--color-border-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-window-bg);
+    border-top: 2px solid var(--color-border-light);
+    border-left: 2px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-darker);
+    border-right: 2px solid var(--color-border-darker);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-btn-hover);
+}
+
+
+/* ============================================================
+   18. MEDIA QUERIES — TABLET (768px y más)
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+    /* La ventana de home y about tiene ancho máximo en tablet */
+    .home-content,
+    .about-content {
+        padding: var(--spacing-xl);
+        align-items: center;
+    }
+
+    .win98-window {
+        max-width: 560px;
+    }
+
+    .clippy-image {
+        width: 150px;
+    }
+
+    .about-clippy-image {
+        width: 110px;
+    }
+
+    /* Los mensajes no ocupan más del 70% del ancho */
+    .message {
+        max-width: 70%;
+    }
+
+    .message-input {
+        font-size: 14px;
+    }
+
+    /* Nav con más padding */
+    .win98-nav {
+        padding: 0 var(--spacing-lg);
+        gap: var(--spacing-sm);
+    }
+}
+
+
+/* ============================================================
+   19. MEDIA QUERIES — DESKTOP (1024px y más)
+   ============================================================ */
+
+@media (min-width: 1024px) {
+
+    body {
+        font-size: 15px;
+    }
+
+    .win98-window {
+        max-width: 640px;
+    }
+
+    .clippy-image {
+        width: 180px;
+    }
+
+    /* En desktop el chat tiene un ancho máximo centrado */
+    .chat-layout {
+        max-width: 860px;
+        margin: 0 auto;
+        width: 100%;
+        border-left: 2px solid var(--color-border-dark);
+        border-right: 2px solid var(--color-border-dark);
+    }
+
+    /* Los mensajes no ocupan más del 60% del ancho */
+    .message {
+        max-width: 60%;
+    }
+
+    .win98-nav {
+        padding: 0 var(--spacing-xl);
+        gap: var(--spacing-md);
+    }
+
+    .nav-link {
+        font-size: 14px;
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+
+    .home-content,
+    .about-content {
+        padding: var(--spacing-xl) var(--spacing-xl);
+        align-items: center;
+    }
+}
