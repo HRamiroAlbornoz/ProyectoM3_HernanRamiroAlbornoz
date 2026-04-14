@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz/issues"
   },
-  "homepage": "https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz#readme"
+  "homepage": "https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.4"
+  }
 }

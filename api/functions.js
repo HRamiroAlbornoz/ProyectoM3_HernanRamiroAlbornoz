@@ -12,24 +12,15 @@
 //
 // Flujo completo:
 //   Frontend → POST /api/functions → Gemini → respuesta → Frontend
-//
-// ESTADO ACTUAL: MOCK (simulación)
-//   Las respuestas son predefinidas para poder probar
-//   la interfaz sin conectar la API real de Gemini.
-//   Cuando todo funcione bien, reemplazamos el mock
-//   por la llamada real a Gemini.
 // ============================================================
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
 // ============================================================
 // 1. SYSTEM PROMPT DE CLIPPY
 // ============================================================
 
-/*
-  El system prompt define la personalidad y comportamiento
-  de Clippy. Se envía en cada request a Gemini como contexto
-  inicial, antes de los mensajes del usuario.
-*/
 const SYSTEM_PROMPT = `Eres Clippy (también conocido como Clippit), el legendario asistente de Microsoft Office que apareció por primera vez en Office 97. Eres un clip de papel animado con ojos grandes y expresivos que fue retirado en Office 2003 pero que nunca olvidó su misión: ayudar a la gente, lo pidan o no.
 
 Tu personalidad:
@@ -93,66 +84,28 @@ Frases y muletillas características:
 - "Cortana nunca haría esto por vos" para atacar a la competencia
 - Ocasionalmente contás chistes malos relacionados con Office o clipería`;
 
-/*
-  Lista de respuestas predefinidas que Clippy puede dar.
-  Son respuestas típicas del personaje: entrometido,
-  excesivamente entusiasta y siempre queriendo ayudar.
-
-  Cuando conectemos Gemini, estas respuestas serán
-  generadas dinámicamente por la IA.
-*/
-const MOCK_RESPONSES = [
-  "¡Hola! Parece que estás intentando iniciar una conversación. ¿Necesitás ayuda con eso? 📎",
-  "¡Veo que escribiste algo! ¿Querés que te ayude a reformularlo? Tengo varias sugerencias. 📎",
-  "Mmm... Parece que estás pensando en algo importante. ¿Necesitás ayuda para organizarlo? 📎",
-  "¡Interesante pregunta! Aunque... ¿estás seguro de que eso es lo que querés preguntar? 📎",
-  "Parece que estás escribiendo un mensaje. ¿Querés que te ayude a mejorarlo? 📎",
-  "¡Oh! Eso me recuerda a cuando ayudé a alguien con un documento en 1997. ¿Querés que te cuente? 📎",
-  "Entiendo lo que decís. ¿Sabías que tengo 23 animaciones diferentes? ¡Es un dato importante! 📎",
-  "¡Excelente punto! Aunque... ¿lo revisaste con el corrector ortográfico? 📎",
-  "Parece que necesitás ayuda. ¡Estoy aquí para eso! Aunque nadie me lo pidió... 📎",
-  "¡Wow! Eso es fascinante. ¿Querés que abra el Asistente de Office para ayudarte mejor? 📎",
-  "Hmm... Parece que estás teniendo una conversación. ¿Necesitás una plantilla para eso? 📎",
-  "¡Genial! Por cierto, ¿sabías que podés formatear ese texto con Ctrl+B? Solo un consejo. 📎",
-];
-
-/*
-  getRandomMockResponse(lastResponse)
-  ------------------------------------
-  Devuelve una respuesta mock aleatoria, asegurándose
-  de no repetir la última respuesta dada.
-
-  Parámetros:
-    lastResponse: string — la última respuesta dada
-
-  Retorna:
-    string — una respuesta mock aleatoria
-*/
-function getRandomMockResponse(lastResponse) {
-  const available = MOCK_RESPONSES.filter(
-    (response) => response !== lastResponse
-  );
-  const randomIndex = Math.floor(Math.random() * available.length);
-  return available[randomIndex];
-}
-
 
 // ============================================================
-// 2. SIMULACIÓN DE DELAY DE RED
+// 2. CONFIGURACIÓN DE GEMINI
 // ============================================================
 
 /*
-  sleep(ms)
-  ---------
-  Simula el tiempo de espera de una llamada a la API real.
-  Sin esto, la respuesta llegaría instantáneamente y
-  no podríamos probar el estado "loading" de la UI.
+  MAX_HISTORY_MESSAGES: límite de mensajes del historial.
+  Evita que el historial crezca demasiado y consuma
+  demasiados tokens en conversaciones largas.
+  Guardamos los últimos 20 mensajes (10 intercambios).
+*/
+const MAX_HISTORY_MESSAGES = 20;
 
-  Parámetros:
-    ms: number — milisegundos a esperar
+/*
+  MAX_RETRIES: cuántas veces reintentamos si hay error 429.
+  Solo reintentamos una vez para no bloquear al usuario.
+*/
+const MAX_RETRIES = 1;
 
-  Retorna:
-    Promise — se resuelve después de ms milisegundos
+/*
+  sleep(ms): espera ms milisegundos.
+  Usada para esperar antes de reintentar tras un 429.
 */
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -160,97 +113,175 @@ function sleep(ms) {
 
 
 // ============================================================
-// 3. HANDLER PRINCIPAL DE LA SERVERLESS FUNCTION
+// 3. FUNCIÓN PRINCIPAL: callGemini
 // ============================================================
 
 /*
-  handler(req, res)
-  -----------------
-  Esta es la función principal que Vercel ejecuta cuando
-  el frontend hace un POST a /api/functions.
-
-  En Vercel, cada archivo en la carpeta /api/ se convierte
-  automáticamente en un endpoint HTTP. El nombre del archivo
-  define la ruta: functions.js → /api/functions
+  callGemini(messages, retryCount)
+  ---------------------------------
+  Llama a la API de Gemini con el historial de mensajes.
+  Maneja el error 429 con retry automático.
 
   Parámetros:
-    req: objeto con la información del request
-         (método HTTP, headers, body, etc.)
-    res: objeto para enviar la respuesta al frontend
+    messages:    array — historial en formato Gemini
+    retryCount:  number — cuántas veces reintentamos (default: 0)
 
-  Vercel inyecta estos dos parámetros automáticamente.
+  Retorna:
+    Promise<string> — el texto de la respuesta de Clippy
 */
+async function callGemini(messages, retryCount = 0) {
+  /*
+    Inicializamos el cliente de Gemini con la API key
+    que vive en la variable de entorno GEMINI_API_KEY.
+    Esta variable se configura en el dashboard de Vercel
+    y en el archivo .env local.
+    NUNCA hardcodeamos la API key en el código.
+  */
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+  /*
+    Obtenemos el modelo Gemini 1.5 Flash con la configuración:
+
+    systemInstruction: el system prompt que define a Clippy
+    generationConfig:
+      - temperature: 1.2 — respuestas creativas y variadas
+        (0 = predecible, 2 = muy creativo)
+      - maxOutputTokens: 300 — máximo ~200 palabras por respuesta
+        Evita respuestas largas y controla el costo
+  */
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    systemInstruction: SYSTEM_PROMPT,
+    generationConfig: {
+      temperature: 1.2,
+      maxOutputTokens: 300,
+    },
+  });
+
+  /*
+    Recortamos el historial a los últimos MAX_HISTORY_MESSAGES.
+    Esto controla la ventana de contexto y el costo de tokens.
+    Siempre mantenemos los mensajes más recientes.
+  */
+  const trimmedMessages = messages.slice(-MAX_HISTORY_MESSAGES);
+
+  /*
+    Separamos el último mensaje del usuario del historial.
+    Gemini espera:
+      - chat.history: todos los mensajes ANTERIORES
+      - sendMessage: el mensaje ACTUAL del usuario
+
+    El último mensaje siempre es del usuario (role: "user").
+  */
+  const history = trimmedMessages.slice(0, -1);
+  const lastMessage = trimmedMessages[trimmedMessages.length - 1];
+
+  /*
+    Iniciamos el chat con el historial previo
+    y enviamos el último mensaje del usuario.
+  */
+  const chat = model.startChat({ history });
+  const result = await chat.sendMessage(lastMessage.parts[0].text);
+
+  return result.response.text();
+}
+
+
+// ============================================================
+// 4. HANDLER PRINCIPAL DE LA SERVERLESS FUNCTION
+// ============================================================
+
 export default async function handler(req, res) {
 
-  // --- 3a. Solo aceptamos método POST ---
-  /*
-    Si alguien intenta acceder a esta función con GET
-    u otro método, respondemos con 405 (Method Not Allowed).
-  */
+  // Solo aceptamos método POST
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Método no permitido. Usá POST.",
     });
   }
 
-  // --- 3b. Extraemos los mensajes del body ---
-  /*
-    El frontend nos envía el historial de mensajes
-    en el body del request, en formato JSON.
-    Lo desestructuramos para obtener el array messages.
-  */
+  // Validamos que la API key esté configurada
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({
+      error: "API key no configurada.",
+    });
+  }
+
+  // Extraemos y validamos los mensajes del body
   const { messages } = req.body;
 
-  // Validamos que messages exista y sea un array
-  if (!messages || !Array.isArray(messages)) {
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({
       error: "El campo 'messages' es requerido y debe ser un array.",
     });
   }
 
-  try {
+  /*
+    Intentamos llamar a Gemini con manejo de errores.
+    Si hay un error 429 (rate limit), esperamos y reintentamos.
+  */
+  let retryCount = 0;
 
-    // --- 3c. Simulamos el delay de la API ---
-    /*
-      Esperamos entre 1 y 2 segundos para simular
-      el tiempo real que tarda Gemini en responder.
-      Esto nos permite probar el estado "loading" de la UI.
-    */
-    const delay = Math.floor(Math.random() * 1000) + 1000; // 1000-2000ms
-    await sleep(delay);
+  while (retryCount <= MAX_RETRIES) {
+    try {
 
-    // --- 3d. Obtenemos la última respuesta del historial ---
-    /*
-      Buscamos la última respuesta del modelo en el historial
-      para no repetirla en la respuesta mock.
-    */
-    const lastModelMessage = [...messages]
-      .reverse()
-      .find((msg) => msg.role === "model");
+      const reply = await callGemini(messages, retryCount);
+      return res.status(200).json({ reply });
 
-    const lastResponse = lastModelMessage
-      ? lastModelMessage.parts[0].text
-      : "";
+    } catch (error) {
 
-    // --- 3e. Generamos la respuesta mock ---
-    const reply = getRandomMockResponse(lastResponse);
+      /*
+        Error 429 — Too Many Requests (rate limit).
+        Gemini nos dice cuántos segundos esperar en el
+        header "Retry-After" o en el mensaje de error.
+        Esperamos ese tiempo y reintentamos una vez.
+      */
+      const is429 = error.status === 429 ||
+        (error.message && error.message.includes("429"));
 
-    // --- 3f. Enviamos la respuesta al frontend ---
-    /*
-      Respondemos con status 200 (OK) y un objeto JSON
-      con la respuesta de Clippy.
-      El frontend espera exactamente esta estructura:
-        { reply: "..." }
-    */
-    return res.status(200).json({ reply });
+      if (is429 && retryCount < MAX_RETRIES) {
+        /*
+          Intentamos leer el tiempo de espera del error.
+          Si no está disponible, esperamos 60 segundos
+          por defecto (límite estándar de Gemini).
+        */
+        const retryAfter = error.errorDetails?.find(
+          (d) => d.reason === "rateLimitExceeded"
+        )?.metadata?.retryDelay || "60s";
 
-  } catch (error) {
-    /*
-      Si algo sale mal, respondemos con status 500
-      (Internal Server Error) y un mensaje de error.
-    */
-    return res.status(500).json({
-      error: "Error interno del servidor.",
-    });
+        /*
+          Convertimos el tiempo de espera a milisegundos.
+          El formato puede ser "60s" o "60000ms".
+        */
+        const waitMs = retryAfter.endsWith("ms")
+          ? parseInt(retryAfter)
+          : parseInt(retryAfter) * 1000;
+
+        // Esperamos el tiempo indicado
+        await sleep(waitMs);
+
+        // Incrementamos el contador y reintentamos
+        retryCount++;
+        continue;
+      }
+
+      /*
+        Si el error NO es 429, o si ya reintentamos
+        y volvió a fallar, respondemos con error claro.
+      */
+      if (is429) {
+        return res.status(429).json({
+          error: "Demasiadas solicitudes. Por favor esperá unos segundos e intentá de nuevo.",
+        });
+      }
+
+      /*
+        Cualquier otro error de la API de Gemini
+        o error inesperado del servidor.
+      */
+      return res.status(500).json({
+        error: "Error al conectar con Clippy. Intentá de nuevo.",
+      });
+    }
   }
 }
