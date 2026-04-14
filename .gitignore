@@ -15,6 +15,9 @@ node_modules/
 # Archivos de Vercel
 .vercel/
 
+# Reporte de cobertura de tests (generado automáticamente)
+coverage/
+
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db

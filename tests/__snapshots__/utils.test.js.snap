@@ -1,0 +1,58 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildApiMessages > el formato de transformación coincide con el snapshot 1`] = `
+[
+  {
+    "parts": [
+      {
+        "text": "Hola",
+      },
+    ],
+    "role": "user",
+  },
+  {
+    "parts": [
+      {
+        "text": "¡Hola! 📎",
+      },
+    ],
+    "role": "model",
+  },
+]
+`;
+
+exports[`formatMessage > la estructura del mensaje coincide con el snapshot 1`] = `
+{
+  "role": "user",
+  "text": "Hola Clippy",
+  "timestamp": 123,
+}
+`;
+
+exports[`getRandomGif > CLIPPY_GIFS coincide con el snapshot 1`] = `
+[
+  "/assets/clippy-white-1.gif",
+  "/assets/clippy-white-2.gif",
+  "/assets/clippy-white-3.gif",
+  "/assets/clippy-white-4.gif",
+  "/assets/clippy-white-5.gif",
+  "/assets/clippy-white-6.gif",
+  "/assets/clippy-white-7.gif",
+  "/assets/clippy-white-8.gif",
+  "/assets/clippy-white-9.gif",
+  "/assets/clippy-white-10.gif",
+  "/assets/clippy-white-11.gif",
+  "/assets/clippy-white-12.gif",
+  "/assets/clippy-white-13.gif",
+  "/assets/clippy-white-14.gif",
+  "/assets/clippy-white-15.gif",
+  "/assets/clippy-white-16.gif",
+  "/assets/clippy-white-17.gif",
+  "/assets/clippy-white-18.gif",
+  "/assets/clippy-white-19.gif",
+  "/assets/clippy-white-20.gif",
+  "/assets/clippy-white-21.gif",
+  "/assets/clippy-white-22.gif",
+  "/assets/clippy-white-23.gif",
+]
+`;
