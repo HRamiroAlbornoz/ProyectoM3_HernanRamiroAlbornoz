@@ -1,0 +1,24 @@
+{
+  "name": "proyectom3_hernanramiroalbornoz",
+  "version": "1.0.0",
+  "description": "SPA para chatear con Clippy usando Google Gemini AI",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz/issues"
+  },
+  "homepage": "https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz#readme"
+}

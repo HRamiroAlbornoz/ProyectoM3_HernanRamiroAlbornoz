@@ -855,6 +855,18 @@ section[data-view] {
 }
 
 
+/* Mensaje de input vacío */
+.empty-message {
+    font-size: 13px;
+    color: var(--color-titlebar);
+    background-color: #ffffc0;
+    /* Amarillo suave, como la burbuja de Clippy */
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-titlebar);
+    border-radius: 2px;
+}
+
+
 /* ============================================================
    16b. VISTA 404
    ============================================================ */
