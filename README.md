@@ -1,5 +1,11 @@
 # 📎 Clippy AI
 
+![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Deploy](https://img.shields.io/badge/deploy-vercel-black)
+![Vanilla JS](https://img.shields.io/badge/vanilla-javascript-yellow)
+![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-blue)
+
 Una Single Page Application (SPA) que te permite conversar con **Clippy**, el legendario asistente de Microsoft Office de los años 90, potenciado por inteligencia artificial.
 
 ![Clippy AI](src/assets/clippy-white-1.gif)
@@ -8,7 +14,7 @@ Una Single Page Application (SPA) que te permite conversar con **Clippy**, el le
 
 ## 🌐 Demo en producción
 
-🔗 [Ver aplicación en Vercel](#) *(se actualiza al hacer el deploy)*
+🔗 [Ver aplicación en Vercel](https://proyecto-m3-hernan-ramiro-albornoz.vercel.app/)
 
 ---
 
@@ -166,6 +172,45 @@ Coverage de utils.js:
 % Funcs:  100%
 % Lines:  100%
 ```
+
+---
+
+## 💡 Decisiones técnicas
+
+| Decisión | Alternativa considerada | Razón |
+|----------|------------------------|-------|
+| Gemini 2.5 Flash | Gemini 1.5 Flash | Mejor calidad de respuestas y modelo más reciente |
+| Vanilla JS | React / Vue | Requisito del proyecto (sin frameworks) |
+| `mix-blend-mode: multiply` | GIFs con fondo transparente | Los GIFs originales tienen fondo blanco |
+| Temperature 1.2 | Temperature 1.0 | Respuestas más creativas y variadas para Clippy |
+| Historial limitado a 20 mensajes | Historial ilimitado | Controlar el consumo de tokens y el costo |
+| Serverless Function como proxy | Llamada directa a Gemini | Proteger la API key en el servidor |
+| jsdom en tests DOM | Ignorar funciones DOM | Alcanzar 100% de cobertura en utils.js |
+
+---
+
+## 🔑 Variables de entorno
+
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `GEMINI_API_KEY` | API key de Google Gemini AI | ✅ Sí |
+
+Para configurar localmente copiá `.env.example` como `.env` y completá el valor:
+
+```bash
+cp .env.example .env
+```
+
+Para configurar en producción agregá la variable en el dashboard de Vercel en **Settings → Environment Variables**.
+
+---
+
+## ⚠️ Limitaciones conocidas
+
+- El historial de conversación **se pierde al recargar la página** — es el comportamiento esperado según el enunciado del proyecto. El historial vive en memoria JavaScript y se borra al recargar. Esto además **reduce el costo de tokens** ya que cada nueva sesión empieza sin historial previo.
+- El historial está limitado a los últimos **20 mensajes** por request para controlar el consumo de tokens
+- Las respuestas están limitadas a **300 tokens** (~200 palabras) para mantener respuestas cortas y controlar costos
+- En el plan gratuito de Gemini el límite es **15 requests por minuto** — si se supera, el retry automático espera y reintenta
 
 ---
 
