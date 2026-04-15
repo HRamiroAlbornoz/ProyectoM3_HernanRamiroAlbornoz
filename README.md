@@ -219,13 +219,13 @@ El archivo `.env` está incluido en `.gitignore` y nunca se sube al repositorio.
 ## 📸 Capturas de pantalla
 
 ### Vista Home
-![Vista Home](docs/screenshot-home.png)
+![Vista Home](docs/home.png)
 
 ### Vista Chat
-![Vista Chat](docs/screenshot-chat.png)
+![Vista Chat](docs/chat.png)
 
 ### Vista About
-![Vista About](docs/screenshot-about.png)
+![Vista About](docs/about.png)
 
 ---
 
