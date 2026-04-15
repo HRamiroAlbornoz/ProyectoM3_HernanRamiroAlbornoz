@@ -97,8 +97,8 @@ clippy-ai/
 **1. Clonar el repositorio:**
 
 ```bash
-git clone https://github.com/tu-usuario/clippy-ai.git
-cd clippy-ai
+git clone https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz.git
+cd ProyectoM3_HernanRamiroAlbornoz
 ```
 
 **2. Instalar dependencias:**
@@ -304,6 +304,8 @@ Este proyecto fue desarrollado con asistencia de Claude (Anthropic) como herrami
 ## 👨‍💻 Autor
 
 **Hernán Ramiro Albornoz**
+
+🔗 [Repositorio en GitHub](https://github.com/HRamiroAlbornoz/ProyectoM3_HernanRamiroAlbornoz)
 
 Proyecto Integrador 3 — Henry Bootcamp
 
