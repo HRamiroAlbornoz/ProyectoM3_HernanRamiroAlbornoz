@@ -54,6 +54,11 @@ clippy-ai/
 ├── api/
 │   └── functions.js          # Serverless Function — proxy seguro a Gemini
 │
+├── docs/
+│   ├── home.png               # Captura de pantalla — Vista Home
+│   ├── chat.png               # Captura de pantalla — Vista Chat
+│   └── about.png              # Captura de pantalla — Vista About
+│
 ├── src/
 │   ├── assets/
 │   │   └── clippy-white-*.gif # 23 animaciones originales de Clippy
